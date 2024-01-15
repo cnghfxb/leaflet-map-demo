@@ -1,40 +1,38 @@
 <template>
-  <div id="map" style="height: 1200px"></div>
+  <div id="map" style="height: 800px"></div>
 </template>
 
 <script>
 import L from "leaflet";
 
-/* var geoJsonData = {
+var geoData1 = {
   "type": "FeatureCollection",
   "features": [
     {
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [-0.09, 51.5]
+        "coordinates": [51.5150456546981,  -0.0926971435546875]
       },
       "properties": {
-        "name": "Point 1"
+        "description": "这是一个地点的描述！",
+        "color": "red"
       }
     },
     {
       "type": "Feature",
       "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [-0.1, 51.51],
-          [-0.08, 51.52]
-        ]
+        "type": "Point",
+        "coordinates": [55.5150456546981,  -0.1926971435546875]
       },
       "properties": {
-        "name": "LineString 1"
+        "description": "这是一个地点的描述！",
+        "color": "red"
       }
-    }
+    } 
   ]
 };
 
- */
 export default {
   name: "YourMapComponent",
   mounted() {
@@ -43,7 +41,17 @@ export default {
   methods: {
     initMap() {
       // 创建地图实例
-      const map = L.map("map").setView([51.505, -0.09], 13);
+      const map = L.map("map").setView([51.505, -0.09], 1);
+
+      //解析geojson并且在地图上添加一个点
+      L.geoJSON(geoData1,{
+          style: function (feature) {
+              return {color: feature.properties.color};
+          }
+      }).bindPopup(function (layer) {
+        return layer.feature.properties.description;
+      }).addTo(map);
+
 
       // 添加瓦片图层
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -52,12 +60,11 @@ export default {
 
       var latlngArr = [];
 
-
       //给地图添加点击事件
       map.on("click", function (e) {
-      
         //经纬度坐标
         const latlng = e.latlng;
+        console.log(latlng)
         latlngArr.push(latlng)
         //设置地图的坐标
         //map.setView(latlng, 7);
@@ -76,7 +83,7 @@ export default {
           size: 箭头大小  
            */
           .arrowheads({fill: true,frequency: 'endonly',  size: '12px'})
-      .addTo(map);
+          .addTo(map);
         }
       });
 
