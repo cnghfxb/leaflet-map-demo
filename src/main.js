@@ -4,6 +4,9 @@ import L from 'leaflet';
 import 'leaflet-arrowheads';
 import 'leaflet/dist/leaflet.css';
 
+import 'leaflet-routing-machine/dist/leaflet-routing-machine.css';
+import 'leaflet-routing-machine/dist/leaflet-routing-machine';
+
 // 配置 Leaflet 默认图标路径
 delete L.Icon.Default.prototype._getIconUrl;
 //设置默认的地图图标

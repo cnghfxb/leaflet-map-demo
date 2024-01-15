@@ -1,38 +1,9 @@
 <template>
-  <div id="map" style="height: 800px"></div>
+  <div id="map" style="height: 600px"></div>
 </template>
 
 <script>
 import L from "leaflet";
-
-var geoData1 = {
-  "type": "FeatureCollection",
-  "features": [
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "Point",
-        "coordinates": [51.5150456546981,  -0.0926971435546875]
-      },
-      "properties": {
-        "description": "这是一个地点的描述！",
-        "color": "red"
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "Point",
-        "coordinates": [55.5150456546981,  -0.1926971435546875]
-      },
-      "properties": {
-        "description": "这是一个地点的描述！",
-        "color": "red"
-      }
-    } 
-  ]
-};
-
 export default {
   name: "YourMapComponent",
   mounted() {
@@ -41,53 +12,49 @@ export default {
   methods: {
     initMap() {
       // 创建地图实例
-      const map = L.map("map").setView([51.505, -0.09], 1);
+      const map = L.map("map").setView([39.907325,116.391367], 10);
 
-      //解析geojson并且在地图上添加一个点
-      L.geoJSON(geoData1,{
-          style: function (feature) {
-              return {color: feature.properties.color};
-          }
-      }).bindPopup(function (layer) {
-        return layer.feature.properties.description;
-      }).addTo(map);
-
+    /*   var personIcon = L.icon ({
+        iconUrl: './assets/person-icon.png',
+        iconSize: [20,20]
+      }) */
+      var mark = L.marker ([39.907325,116391367]).addTo(map);
 
       // 添加瓦片图层
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
         attribution: "© OpenStreetMap contributors",
-      }).addTo(map);
+      }).addTo(map)
 
-      var latlngArr = [];
+      
+      // 创建一个标记的图层组
+      var markerGroup = L.layerGroup().addTo(map);
 
-      //给地图添加点击事件
-      map.on("click", function (e) {
-        //经纬度坐标
-        const latlng = e.latlng;
-        console.log(latlng)
-        latlngArr.push(latlng)
-        //设置地图的坐标
-        //map.setView(latlng, 7);
-        //添加标记
-        L.marker(latlng).addTo(map);
-        const l = latlngArr.length;
-        if (l > 1) {
-          L.polyline([latlngArr[l - 2],latlngArr[l - 1]],{opacity: 1,color:'red',smoothFactor: 5 })
-          /* 
-          frequency: 频率
-                  'allvertices' renders an arrowhead on each vertex.
-                  'endonly' renders only one at the end.
-                  A number value renders that number of arrowheads evenly spaces across the polyline.
-                  A string value with suffix 'm' (i.e. '100m') will render arrowheads spaced evenly along the polyline with roughly that many meters between each one.
-                  A string value with suffix 'px' (i.e. '30px') will render arrowheads spaced evenly with roughly that many pixels between each, regardless of zoom level.
-          size: 箭头大小  
-           */
-          .arrowheads({fill: true,frequency: 'endonly',  size: '12px'})
-          .addTo(map);
+      map.on('click',(e) => {
+        var markers = markerGroup.getLayers();
+        if (markers.length === 2) {
+          markerGroup.clearLayers();
         }
-      });
-
-
+        //添加标记
+        L.marker(e.latlng).addTo(markerGroup);
+   
+        if (markerGroup.getLayers().length === 2) {
+          const marks = markerGroup.getLayers()
+          console.log(markerGroup.getLayers())
+          L.Routing.control({
+            waypoints: [
+              L.latLng([marks[0]._latlng.lat,marks[0]._latlng.lng]),
+              L.latLng([marks[1]._latlng.lat,marks[1]._latlng.lng])
+            ]
+          }).on('routesfound',(e) => {
+            e.routes[0].coordinates.forEach((coord,index) => {
+              setTimeout(() => {
+                console.log ('111222333')
+                mark.setLatLng([coord.lat,coord.lng])
+              },100*index)
+            })
+          }).addTo(map)
+        }
+      })
     },
   },
 };
