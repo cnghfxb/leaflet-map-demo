@@ -5,6 +5,36 @@
 <script>
 import L from "leaflet";
 
+/* var geoJsonData = {
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-0.09, 51.5]
+      },
+      "properties": {
+        "name": "Point 1"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [-0.1, 51.51],
+          [-0.08, 51.52]
+        ]
+      },
+      "properties": {
+        "name": "LineString 1"
+      }
+    }
+  ]
+};
+
+ */
 export default {
   name: "YourMapComponent",
   mounted() {
@@ -20,26 +50,37 @@ export default {
         attribution: "© OpenStreetMap contributors",
       }).addTo(map);
 
-      var marker;
+      var latlngArr = [];
+
 
       //给地图添加点击事件
       map.on("click", function (e) {
-        if (marker) {
-          marker.remove();
-        }
-
+      
         //经纬度坐标
-        var latlng = e.latlng;
+        const latlng = e.latlng;
+        latlngArr.push(latlng)
         //设置地图的坐标
         //map.setView(latlng, 7);
         //添加标记
-        marker = L.marker(latlng, {
-          iconUrl:
-            "https://cdn.pixabay.com/photo/2013/07/13/10/29/icon-157354_1280.png",
-          iconSize: [30, 50],
-        }).addTo(map);
-        marker._leaflet_id = "marker1";
+        L.marker(latlng).addTo(map);
+        const l = latlngArr.length;
+        if (l > 1) {
+          L.polyline([latlngArr[l - 2],latlngArr[l - 1]],{opacity: 1,color:'red',smoothFactor: 5 })
+          /* 
+          frequency: 频率
+                  'allvertices' renders an arrowhead on each vertex.
+                  'endonly' renders only one at the end.
+                  A number value renders that number of arrowheads evenly spaces across the polyline.
+                  A string value with suffix 'm' (i.e. '100m') will render arrowheads spaced evenly along the polyline with roughly that many meters between each one.
+                  A string value with suffix 'px' (i.e. '30px') will render arrowheads spaced evenly with roughly that many pixels between each, regardless of zoom level.
+          size: 箭头大小  
+           */
+          .arrowheads({fill: true,frequency: 'endonly',  size: '12px'})
+      .addTo(map);
+        }
       });
+
+
     },
   },
 };

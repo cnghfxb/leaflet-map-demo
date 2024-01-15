@@ -11,8 +11,11 @@
     "core-js": "^3.8.3",
     "dayjs": "^1.11.10",
     "fecha": "^4.2.3",
+    "install": "^0.13.0",
     "leaflet": "^1.9.4",
+    "leaflet-arrowheads": "^1.4.0",
     "luxon": "^3.4.3",
+    "npm": "^10.3.0",
     "vue": "^3.2.13"
   },
   "devDependencies": {
